@@ -16,17 +16,23 @@ import javax.inject.Named;
  * Holds known cities; wrapper over Set<City> that ignores case
  */
 public class KnownCities extends HashSet<String> {
+    private List<String> originalStrings;
 
     // store in lower case
     public KnownCities(@NonNull Collection<? extends String> c) {
         super(c.stream()
                 .map(String::toLowerCase)
                 .collect(Collectors.toList()));
+        originalStrings = (List<String>) c;
     }
 
     @Override
     public boolean contains(@Nullable Object o) {
         String lower = ((String) o).toLowerCase();
         return super.contains(lower);
+    }
+
+    public List<String> getAsList() {
+        return originalStrings;
     }
 }

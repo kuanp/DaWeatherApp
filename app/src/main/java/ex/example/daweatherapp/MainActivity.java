@@ -95,11 +95,13 @@ public class MainActivity extends AppCompatActivity {
         resultTextView.setVisibility(View.INVISIBLE);
 
         cityInputTextView = findViewById(R.id.cityInputTextView);
+        cityInputTextView.setAdapter(
+                new ArrayAdapter<String>(this, R.layout.autocomplete_textview, knownCities.getAsList()));
 
         activityLayout = (ConstraintLayout) findViewById(R.id.mainLayout);
     }
 
-    public void onSearchButtonClicked(View view) {
+    private void startSearch() {
         String citySelected = cityInputTextView.getText().toString();
         if (knownCities.contains(citySelected)) {
             hideKeyboard(this);
@@ -108,6 +110,10 @@ public class MainActivity extends AppCompatActivity {
             resultTextView.setText(citySelected + " is not a valid city.");
             resultTextView.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void onSearchButtonClicked(View view) {
+        startSearch();
     }
 
     // utility method
