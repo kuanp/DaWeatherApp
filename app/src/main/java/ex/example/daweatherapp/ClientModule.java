@@ -18,6 +18,7 @@ import dagger.Module;
 import dagger.Provides;
 import ex.example.daweatherapp.services.openweather.City;
 import ex.example.daweatherapp.services.openweather.CityJsonParser;
+import ex.example.daweatherapp.services.openweather.KnownCities;
 import ex.example.daweatherapp.services.openweather.OpenWeatherService;
 import ex.example.daweatherapp.services.unsplash.UnsplashService;
 import okhttp3.Interceptor;
@@ -75,14 +76,13 @@ public class ClientModule {
     }
 
     @Provides
-    @Named("knownCities")
-    public List<String> provideKnownCities() {
+    public KnownCities provideKnownCities() {
         // super heavy. Probably should do this on a background thread...
         List<City> cities = CityJsonParser.parseCitiesFromJSONFile(citiesInputStream);
         Log.i("TT", "Num:" + cities.size());
-        return cities.parallelStream()
-                .map(city -> city.getName())
-                .collect(Collectors.toList());
+        return new KnownCities(cities.parallelStream()
+                .map(City::getName)
+                .collect(Collectors.toList()));
     }
 
     @Provides

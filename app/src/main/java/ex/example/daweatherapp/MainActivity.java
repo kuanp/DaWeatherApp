@@ -24,10 +24,8 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import ex.example.daweatherapp.services.openweather.City;
-import ex.example.daweatherapp.services.openweather.OpenWeatherService;
+import ex.example.daweatherapp.services.openweather.KnownCities;
 import ex.example.daweatherapp.services.openweather.OpenWeatherServiceWrapper;
-import ex.example.daweatherapp.services.openweather.Weather;
 import ex.example.daweatherapp.services.openweather.WeatherResponse;
 import ex.example.daweatherapp.services.unsplash.UnsplashServiceWrapper;
 
@@ -44,9 +42,7 @@ public class MainActivity extends AppCompatActivity {
     UnsplashServiceWrapper unsplashServiceWrapper;
 
     @Inject
-    @Named("knownCities")
-    List<String> knownCities;
-    Set<String> knownCitiesSet;
+    KnownCities knownCities;
 
     private class GetWeatherAsyncTask extends AsyncTask<String, Void, WeatherResponse> {
         @Override
@@ -99,14 +95,13 @@ public class MainActivity extends AppCompatActivity {
         resultTextView.setVisibility(View.INVISIBLE);
 
         cityInputTextView = findViewById(R.id.cityInputTextView);
-        knownCitiesSet = new HashSet<>(knownCities);
 
         activityLayout = (ConstraintLayout) findViewById(R.id.mainLayout);
     }
 
     public void onSearchButtonClicked(View view) {
         String citySelected = cityInputTextView.getText().toString();
-        if (knownCitiesSet.contains(citySelected)) {
+        if (knownCities.contains(citySelected)) {
             hideKeyboard(this);
             new GetWeatherAsyncTask().execute(cityInputTextView.getText().toString());
         } else {

@@ -1,7 +1,5 @@
 package ex.example.daweatherapp.services.openweather;
 
-import android.content.res.Resources;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
