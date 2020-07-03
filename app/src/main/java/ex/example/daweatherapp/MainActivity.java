@@ -8,21 +8,16 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Layout;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import android.widget.Toast;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import ex.example.daweatherapp.services.openweather.KnownCities;
 import ex.example.daweatherapp.services.openweather.OpenWeatherServiceWrapper;
@@ -78,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Bitmap image) {
             super.onPostExecute(image);
-            // TODO: implement animation effects
+            // TODO: implement animation effects around background images
             activityLayout.setBackground(new BitmapDrawable(getResources(), image));
         }
     }
@@ -97,19 +92,42 @@ public class MainActivity extends AppCompatActivity {
         cityInputTextView = findViewById(R.id.cityInputTextView);
         cityInputTextView.setAdapter(
                 new ArrayAdapter<String>(this, R.layout.autocomplete_textview, knownCities.getAsList()));
-
+        cityInputTextView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (v.equals(cityInputTextView) &&
+                        event.getAction() == KeyEvent.ACTION_DOWN &&
+                        keyCode == KeyEvent.KEYCODE_ENTER) {
+                    startSearch();
+                    return true;
+                }
+                return false;
+            }
+        });
         activityLayout = (ConstraintLayout) findViewById(R.id.mainLayout);
     }
 
     private void startSearch() {
         String citySelected = cityInputTextView.getText().toString();
+        if (citySelected.isEmpty()) {
+            showInvalidInputToast("Please enter a city.");
+            return;
+        }
         if (knownCities.contains(citySelected)) {
             hideKeyboard(this);
             new GetWeatherAsyncTask().execute(cityInputTextView.getText().toString());
         } else {
-            resultTextView.setText(citySelected + " is not a valid city.");
-            resultTextView.setVisibility(View.VISIBLE);
+            Log.e(TAG, "Tried to search invalid city" + citySelected);
+            showInvalidInputToast(citySelected + " is not a valid city.");
         }
+    }
+
+    private void showInvalidInputToast(String msg) {
+        Toast toast = Toast.makeText(getApplicationContext(),
+                msg,
+                Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.TOP, 0, 1000);
+        toast.show();
     }
 
     public void onSearchButtonClicked(View view) {
